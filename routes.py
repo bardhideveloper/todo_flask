@@ -2,32 +2,25 @@ from flask import jsonify, render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import db, User, Task
-import json
 
 def init_app(app):
 
     # -----------------------------
     # LOGIN & REGISTER ROUTES
     # -----------------------------
-    
     @app.route("/register", methods=["GET", "POST"])
     def register():
         if request.method == "POST":
             username = request.form["username"]
             password = request.form["password"]
 
-            user = User.query.filter_by(username=username).first()
-            if user:
+            if User.query.filter_by(username=username).first():
                 flash("Username already exists!")
                 return redirect(url_for("register"))
 
-            new_user = User(
-                username=username,
-                password=generate_password_hash(password)
-            )
+            new_user = User(username=username, password=generate_password_hash(password))
             db.session.add(new_user)
             db.session.commit()
-
             flash("Account created! You can now log in.")
             return redirect(url_for("login"))
 
@@ -72,12 +65,7 @@ def init_app(app):
         priority = request.form.get("priority") or "Medium"
 
         if task_text:
-            new_task = Task(
-                task=task_text,
-                user_id=current_user.id,
-                deadline=deadline,
-                priority=priority
-            )
+            new_task = Task(task=task_text, user_id=current_user.id, deadline=deadline, priority=priority)
             db.session.add(new_task)
             db.session.commit()
         return redirect(url_for("index"))
@@ -99,23 +87,21 @@ def init_app(app):
             task.completed = not task.completed
             db.session.commit()
         return redirect(url_for("index"))
-    
+
     @app.route("/toggle_theme")
     @login_required
     def toggle_theme():
-        # Switch theme
         current_user.theme = "dark" if current_user.theme == "light" else "light"
         db.session.commit()
         return redirect(request.referrer or url_for("index"))
-    
+
     @app.route("/reorder", methods=["POST"])
     @login_required
     def reorder():
-        data = request.get_json()
+        data = request.get_json() or []
         for item in data:
-            task = Task.query.get(int(item['id']))
-        if task and task.user_id == current_user.id:
-            task.order = item['order']
+            task = Task.query.get(int(item.get('id')))
+            if task and task.user_id == current_user.id:
+                task.order = item.get('order', task.order)
         db.session.commit()
         return jsonify({"status": "ok"})
-

@@ -7,9 +7,11 @@ def create_app():
     app = Flask(__name__)
 
     # -----------------------------
-    # Use Postgres database from Render
+    # DATABASE (Postgres in Render)
     # -----------------------------
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///todo.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        "DATABASE_URL", "sqlite:///todo.db"
+    )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "bardhiyllka")
 
@@ -25,7 +27,7 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Import routes
+    # Routes
     import routes
     routes.init_app(app)
 
@@ -36,9 +38,9 @@ def create_app():
     return app
 
 # -----------------------------
-# Expose WSGI app for Gunicorn
+# Expose app instance for Gunicorn
 # -----------------------------
-app = create_app()  # <- Gunicorn should point to this 'app', not create_app()
+app = create_app()
 
 # -----------------------------
 # Local dev
