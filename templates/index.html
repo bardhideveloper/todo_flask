@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<form action="/add" method="POST">
+    <input type="text" name="task" placeholder="Add a task..." required>
+
+    <label>Deadline:</label>
+    <input type="date" name="deadline">
+
+    <label>Priority:</label>
+    <select name="priority">
+        <option value="Low">Low</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="High">High</option>
+    </select>
+
+    <button type="submit">Add</button>
+</form>
+
+
+<ul id="tasks-list">
+    {% for t in tasks %}
+    <li data-id="{{ t.id }}">
+        <strong>{{ t.task }}</strong>
+        {% if t.deadline %} | Deadline: {{ t.deadline }}{% endif %}
+        | Priority: {{ t.priority }}
+        <a href="/complete/{{ t.id }}">✔</a>
+        <a href="/delete/{{ t.id }}">✖</a>
+    </li>
+    {% endfor %}
+</ul>
+<script>
+    const list = document.getElementById('tasks-list');
+    Sortable.create(list, {
+        animation: 150,
+        onEnd: function (evt) {
+            const order = Array.from(list.children).map((li, index) => ({
+                id: li.dataset.id,
+                order: index
+            }));
+            
+            fetch('/reorder', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(order)
+            });
+        }
+    });
+</script>
+
+
+{% endblock %}
