@@ -16,6 +16,7 @@ def create_app():
 
     # Import User model here to avoid circular imports
     from database import User
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
@@ -24,16 +25,20 @@ def create_app():
     import routes
     routes.init_app(app)
 
+    # Create database tables if they don't exist
+    with app.app_context():
+        db.create_all()
+
     return app
 
 
-# For local development
+# -----------------------------
+# Expose Flask app instance for Gunicorn
+# -----------------------------
+app = create_app()
+
+# -----------------------------
+# Local development
+# -----------------------------
 if __name__ == "__main__":
-    app = create_app()
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
-
-# For Render / Gunicorn deployment
-app = create_app()  # This exposes a WSGI app instance for Gunicorn
-
