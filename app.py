@@ -27,8 +27,13 @@ def create_app():
     return app
 
 
+# For local development
 if __name__ == "__main__":
     app = create_app()
     with app.app_context():
-        db.create_all()  # Create tables if they don't exist
+        db.create_all()
     app.run(debug=True)
+
+# For Render / Gunicorn deployment
+app = create_app()  # This exposes a WSGI app instance for Gunicorn
+
