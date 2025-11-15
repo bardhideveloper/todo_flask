@@ -1,73 +1,233 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f1f1f1;
-}
-body.light {
-    background-color: #f5f5f5;
-    color: #222;
-}
-
-body.dark {
-    background-color: #222;
-    color: #f5f5f5;
-}
-
-/* Optional: style links/buttons differently in dark mode */
-body.dark a {
-    color: #ffd700;
-}
-
-body.light a {
-    color: #007bff;
-}
-
-
-.container {
-    width: 400px;
-    margin: 50px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-h1 {
-    text-align: center;
-}
-
-form input {
-    width: 70%;
-    padding: 8px;
-}
-
-form button {
-    padding: 9px 15px;
-    cursor: pointer;
-}
-
-ul {
-    list-style: none;
+/* ===========================
+   GLOBAL RESET
+=========================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
     padding: 0;
 }
 
+/* ===========================
+   THEME VARIABLES
+=========================== */
+body.light {
+    --bg: #f5f7fb;
+    --text: #1c1c1c;
+    --card-bg: #ffffff;
+    --input-bg: #f0f2f5;
+    --accent: #4a6cf7;
+    --accent-hover: #3650c2;
+    --danger: #e74c3c;
+}
+
+body.dark {
+    --bg: #141414;
+    --text: #eeeeee;
+    --card-bg: #1f1f1f;
+    --input-bg: #2a2a2a;
+    --accent: #4a90ff;
+    --accent-hover: #3370d1;
+    --danger: #ff6b6b;
+}
+
+/* ===========================
+   GLOBAL STYLES
+=========================== */
+body {
+    font-family: "Inter", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: 0.3s ease;
+    padding: 20px;
+}
+
+h1, h2 {
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* ===========================
+   MAIN CONTAINER
+=========================== */
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* TWO-COLUMN LAYOUT */
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 20px;
+}
+
+/* MOBILE */
+@media (max-width: 700px) {
+    .two-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===========================
+   CARDS
+=========================== */
+.card {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0px 8px 22px rgba(0,0,0,0.1);
+}
+
+/* Add Task Card */
+.add-card h2 {
+    margin-bottom: 20px;
+}
+
+/* Tasks Card */
+.tasks-card h2 {
+    margin-bottom: 15px;
+}
+
+/* ===========================
+   FORM ELEMENTS
+=========================== */
+form input,
+form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    background: var(--input-bg);
+    color: var(--text);
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+form input:focus,
+form select:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+form button {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    border: none;
+    color: white;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+form button:hover {
+    background: var(--accent-hover);
+}
+
+/* ===========================
+   TASK LIST
+=========================== */
+ul {
+    list-style: none;
+    margin-top: 15px;
+}
+
 li {
-    background: #eee;
-    margin: 8px 0;
-    padding: 10px;
-    border-radius: 5px;
+    background: var(--input-bg);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
 }
 
+li:hover {
+    transform: translateY(-2px);
+}
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.task-meta {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Completed task */
 .done {
+    opacity: 0.5;
     text-decoration: line-through;
-    opacity: 0.6;
 }
 
-a {
-    text-decoration: none;
-    margin-left: 10px;
+/* Action buttons */
+.action-buttons a {
+    margin-left: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--accent);
 }
 
-.delete {
-    color: red;
+.action-buttons .delete {
+    color: var(--danger);
+}
+
+/* MOBILE TASK ITEM FIX */
+@media (max-width: 480px) {
+    li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-buttons {
+        width: 100%;
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+/* ===========================
+   NAV & AUTH LINKS
+=========================== */
+.nav {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+}
+
+.nav a {
+    color: var(--accent);
+}
+
+.nav a:hover {
+    text-decoration: underline;
+}
+
+/* ===========================
+   THEME TOGGLE LINK
+=========================== */
+.toggle-theme {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.toggle-theme a {
+    color: var(--accent);
+    font-size: 14px;
 }

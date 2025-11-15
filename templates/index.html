@@ -3,44 +3,67 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-<form action="/add" method="POST">
-    <input type="text" name="task" placeholder="Add a task..." required>
+<div class="two-columns">
 
-    <label>Deadline:</label>
-    <input type="date" name="deadline">
+    <!-- LEFT: Add Task -->
+    <div class="card add-card">
 
-    <label>Priority:</label>
-    <select name="priority">
-        <option value="Low">Low</option>
-        <option value="Medium" selected>Medium</option>
-        <option value="High">High</option>
-    </select>
+        <h2>Add New Task</h2>
 
-    <button type="submit">Add</button>
-</form>
+        <form action="/add" method="POST">
+            <input type="text" name="task" placeholder="Task name..." required>
+
+            <label>Deadline:</label>
+            <input type="date" name="deadline">
+
+            <label>Priority:</label>
+            <select name="priority">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+            </select>
+
+            <button type="submit">Add Task</button>
+        </form>
+
+    </div>
+
+    <!-- RIGHT: Task List -->
+    <div class="card tasks-card">
+        <h2>{{ current_user.username }} Tasks</h2>
+
+        <ul id="tasks-list">
+            {% for t in tasks %}
+            <li data-id="{{ t.id }}" class="{% if t.completed %}done{% endif %}">
+
+                <div class="task-info">
+                    <strong>{{ t.task }}</strong><br>
+                    {% if t.deadline %}<small>Deadline: {{ t.deadline }}</small><br>{% endif %}
+                    <small>Priority: {{ t.priority }}</small>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/complete/{{ t.id }}">✔</a>
+                    <a class="delete" href="/delete/{{ t.id }}">✖</a>
+                </div>
+
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</div>
 
 
-<ul id="tasks-list">
-    {% for t in tasks %}
-    <li data-id="{{ t.id }}">
-        <strong>{{ t.task }}</strong>
-        {% if t.deadline %} | Deadline: {{ t.deadline }}{% endif %}
-        | Priority: {{ t.priority }}
-        <a href="/complete/{{ t.id }}">✔</a>
-        <a href="/delete/{{ t.id }}">✖</a>
-    </li>
-    {% endfor %}
-</ul>
 <script>
     const list = document.getElementById('tasks-list');
     Sortable.create(list, {
         animation: 150,
-        onEnd: function (evt) {
+        onEnd: () => {
             const order = Array.from(list.children).map((li, index) => ({
                 id: li.dataset.id,
                 order: index
             }));
-            
             fetch('/reorder', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -49,6 +72,5 @@
         }
     });
 </script>
-
 
 {% endblock %}

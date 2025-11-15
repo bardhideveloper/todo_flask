@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>To-Do List</title>
-   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <title>To-Do App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="{% if current_user.is_authenticated %}{{ current_user.theme }}{% else %}light{% endif %}">
-
+<body class="{{ current_user.theme if current_user.is_authenticated else 'light' }}">
 
 <div class="container">
+
     <h1>To-Do List</h1>
+
     {% if current_user.is_authenticated %}
-    <a href="{{ url_for('toggle_theme') }}">
-        Toggle {{ 'Dark' if current_user.theme == 'light' else 'Light' }} Mode
-    </a>
-{% endif %}
+    <div class="toggle-theme">
+        <a href="{{ url_for('toggle_theme') }}">
+            Switch to {{ 'Dark' if current_user.theme == 'light' else 'Light' }} Mode
+        </a>
+    </div>
+    {% endif %}
 
     {% block content %}{% endblock %}
+
     <div class="nav">
-    {% if current_user.is_authenticated %}
-        Logged in as: {{ current_user.username }} |
-        <a href="/logout">Logout</a>
-    {% else %}
-        <a href="/login">Login</a> |
-        <a href="/register">Register</a>
-    {% endif %}
-</div>
+        {% if current_user.is_authenticated %}
+            Logged in as <b>{{ current_user.username }}</b> |
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a> |
+            <a href="/register">Register</a>
+        {% endif %}
+    </div>
 
 </div>
 
