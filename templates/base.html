@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>To-Do App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -8,31 +9,32 @@
 
 <body class="{{ current_user.theme if current_user.is_authenticated else 'light' }}">
 
-<div class="container">
+    <div class="container">
 
-    <h1>To-Do List</h1>
+        <h1>To-Do App</h1>
 
-    {% if current_user.is_authenticated %}
-    <div class="toggle-theme">
-        <a href="{{ url_for('toggle_theme') }}">
-            Switch to {{ 'Dark' if current_user.theme == 'light' else 'Light' }} Mode
-        </a>
-    </div>
-    {% endif %}
-
-    {% block content %}{% endblock %}
-
-    <div class="nav">
         {% if current_user.is_authenticated %}
-            Logged in as <b>{{ current_user.username }}</b> |
-            <a href="/logout">Logout</a>
-        {% else %}
-            <a href="/login">Login</a> |
-            <a href="/register">Register</a>
+        <div class="toggle-theme">
+            <a class="btn-link" href="{{ url_for('toggle_theme') }}">
+                Switch to {{ 'Dark' if current_user.theme == 'light' else 'Light' }} Mode
+            </a>
+        </div>
         {% endif %}
-    </div>
 
-</div>
+        {% block content %}{% endblock %}
+
+        <div class="nav">
+            {% if current_user.is_authenticated %}
+            Logged in as <b>{{ current_user.username }}</b> |
+            <a class="btn-link danger" href="/logout">Logout</a>
+            {% else %}
+            <a class="btn-link auth-pink" href="/login">Login</a> |
+            <a class="btn-link auth-pink" href="/register">Register</a>
+            {% endif %}
+        </div>
+
+    </div>
 
 </body>
+
 </html>

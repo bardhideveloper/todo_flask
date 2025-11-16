@@ -8,7 +8,7 @@
     <!-- LEFT: Add Task -->
     <div class="card add-card">
 
-        <h2>Add New Task</h2>
+        <h2>New Task</h2>
 
         <form action="/add" method="POST">
             <input type="text" name="task" placeholder="Task name..." required>
@@ -38,13 +38,24 @@
 
                 <div class="task-info">
                     <strong>{{ t.task }}</strong><br>
-                    {% if t.deadline %}<small>Deadline: {{ t.deadline }}</small><br>{% endif %}
-                    <small>Priority: {{ t.priority }}</small>
+
+                    <div class="task-meta-row">
+                        {% if t.deadline %}
+                        <div class="deadline-badge">
+                            📅 {{ t.deadline }}
+                        </div>
+                        {% endif %}
+
+                        <div class="priority-badge {{ t.priority|lower }}">
+                            {{ t.priority }}
+                        </div>
+                    </div>
                 </div>
 
+
                 <div class="action-buttons">
-                    <a href="/complete/{{ t.id }}">✔</a>
-                    <a class="delete" href="/delete/{{ t.id }}">✖</a>
+                    <a href="/complete/{{ t.id }}" class="btn-icon success">✔</a>
+                    <a href="/delete/{{ t.id }}" class="btn-icon danger">✖</a>
                 </div>
 
             </li>
@@ -66,7 +77,7 @@
             }));
             fetch('/reorder', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(order)
             });
         }
