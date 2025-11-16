@@ -325,6 +325,17 @@ li:hover {
     color: white;
 }
 
+.btn-icon.warning {
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+.btn-icon.warning:hover {
+    background: var(--warning);
+    color: white;
+}
+
+
 .btn-link {
     display: inline-block;
     padding: 10px 18px;
