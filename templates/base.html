@@ -15,10 +15,15 @@
 
         {% if current_user.is_authenticated %}
         <div class="toggle-theme">
-            <a class="btn-link" href="{{ url_for('toggle_theme') }}">
-                Switch to {{ 'Dark' if current_user.theme == 'light' else 'Light' }} Mode
+            <a class="btn-theme-toggle" href="{{ url_for('toggle_theme') }}">
+                {% if current_user.theme == 'light' %}
+                🌙
+                {% else %}
+                ☀️
+                {% endif %}
             </a>
         </div>
+
         {% endif %}
 
         {% block content %}{% endblock %}
