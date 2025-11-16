@@ -231,3 +231,6 @@ li:hover {
     color: var(--accent);
     font-size: 14px;
 }
+.login-card h2 {
+    margin-bottom: 20px;
+}
