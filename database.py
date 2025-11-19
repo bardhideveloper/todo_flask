@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -23,5 +24,10 @@ class Task(db.Model):
     deadline = db.Column(db.String(20))
     priority = db.Column(db.String(10), default="Medium")
     order = db.Column(db.Integer, default=0)
+
+    created_by = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_by = db.Column(db.String(100))
+    updated_at = db.Column(db.DateTime)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)

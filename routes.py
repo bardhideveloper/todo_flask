@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import jsonify, render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -63,9 +64,10 @@ def init_app(app):
         task_text = request.form.get("task")
         deadline = request.form.get("deadline") or None
         priority = request.form.get("priority") or "Medium"
+        
 
         if task_text:
-            new_task = Task(task=task_text, user_id=current_user.id, deadline=deadline, priority=priority)
+            new_task = Task(task=task_text, user_id=current_user.id, deadline=deadline, priority=priority, created_by=current_user.username,created_at=datetime.utcnow())
             db.session.add(new_task)
             db.session.commit()
         return redirect(url_for("index"))
@@ -90,6 +92,8 @@ def init_app(app):
             task.task = request.form.get("task")
             task.deadline = request.form.get("deadline") or None
             task.priority = request.form.get("priority")
+            task.updated_by = current_user.username
+            task.updated_at = datetime.utcnow()
             db.session.commit()
             return jsonify({"success":True})
 
@@ -101,6 +105,8 @@ def init_app(app):
         task = Task.query.get(id)
         if task and task.user_id == current_user.id:
             task.completed = not task.completed
+            task.updated_by = current_user.username
+            task.updated_at = datetime.utcnow()
             db.session.commit()
         return redirect(url_for("index"))
 
@@ -119,5 +125,7 @@ def init_app(app):
             task = Task.query.get(int(item.get('id')))
             if task and task.user_id == current_user.id:
                 task.order = item.get('order', task.order)
+                task.updated_by = current_user.username
+                task.updated_at = datetime.utcnow()
         db.session.commit()
         return jsonify({"status": "ok"})
