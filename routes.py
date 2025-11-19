@@ -14,12 +14,21 @@ def init_app(app):
         if request.method == "POST":
             username = request.form["username"]
             password = request.form["password"]
+            email = request.form["email"]
+            birthdate = request.form.get("birthdate")
+            gender = request.form.get("gender")
+            address = request.form.get("address")
+            phone = request.form.get("phone")
 
             if User.query.filter_by(username=username).first():
                 flash("Username already exists!")
                 return redirect(url_for("register"))
+            
+            if User.query.filter_by(email=email).first():
+                flash("Email already registered!")
+                return redirect(url_for("register"))
 
-            new_user = User(username=username, password=generate_password_hash(password))
+            new_user = User(username=username, password=generate_password_hash(password),email=email,birthdate=birthdate,gender=gender,address=address,phone=phone)
             db.session.add(new_user)
             db.session.commit()
             flash("Account created! You can now log in.")

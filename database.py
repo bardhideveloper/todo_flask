@@ -12,6 +12,12 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     theme = db.Column(db.String(10), default="light")  # light or dark
 
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    birthdate = db.Column(db.String(20))
+    gender = db.Column(db.String(20))
+    address = db.Column(db.String(255))
+    phone = db.Column(db.String(20))
+
     tasks = db.relationship("Task", backref="user", lazy=True, cascade="all, delete-orphan")
 
 
