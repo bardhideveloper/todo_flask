@@ -84,18 +84,16 @@ def init_app(app):
     def edit(id):
         task = Task.query.get(id)
         if not task or task.user_id != current_user.id:
-            return redirect(url_for("index"))
+            return jsonify({"error":"Unauthorized"}), 403
 
         if request.method == "POST":
             task.task = request.form.get("task")
             task.deadline = request.form.get("deadline") or None
             task.priority = request.form.get("priority")
             db.session.commit()
-            return redirect(url_for("index"))
+            return jsonify({"success":True})
 
-        return render_template("edit.html", task=task)
-
-
+        return render_template("edit_form.html", task=task)
 
     @app.route("/complete/<int:id>")
     @login_required

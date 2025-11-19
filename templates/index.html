@@ -5,9 +5,7 @@
 
 <div class="two-columns">
 
-    <!-- LEFT: Add Task -->
     <div class="card add-card">
-
         <h2>New Task</h2>
 
         <form action="/add" method="POST">
@@ -28,7 +26,6 @@
 
     </div>
 
-    <!-- RIGHT: Task List -->
     <div class="card tasks-card">
         <h2>{{ current_user.username }} Tasks</h2>
 
@@ -41,21 +38,17 @@
 
                     <div class="task-meta-row">
                         {% if t.deadline %}
-                        <div class="deadline-badge">
-                            📅 {{ t.deadline }}
-                        </div>
+                        <div class="deadline-badge">📅 {{ t.deadline }}</div>
                         {% endif %}
-
-                        <div class="priority-badge {{ t.priority|lower }}">
-                            {{ t.priority }}
-                        </div>
+                        <div class="priority-badge {{ t.priority|lower }}">{{ t.priority }}</div>
                     </div>
                 </div>
 
-
                 <div class="action-buttons">
                     <a href="/complete/{{ t.id }}" class="btn-icon success">✔</a>
-                    <a href="/edit/{{ t.id }}" class="btn-icon warning">✎</a>
+
+                    <a href="/edit/{{ t.id }}" class="btn-icon warning edit-btn">✎</a>
+
                     <a href="/delete/{{ t.id }}" class="btn-icon danger">✖</a>
                 </div>
 
@@ -66,23 +59,77 @@
 
 </div>
 
+<div id="editModal" class="modal" style="display:none;">
+    <div class="modal-content card">
+        <span id="closeModal" class="close-btn">×</span>
+        <div id="modal-body">
+            <!-- edit_form.html loads here -->
+        </div>
+    </div>
+</div>
 
 <script>
-    const list = document.getElementById('tasks-list');
+    /* SortableJS for drag-reorder */
+    const list = document.getElementById("tasks-list");
     Sortable.create(list, {
         animation: 150,
         onEnd: () => {
-            const order = Array.from(list.children).map((li, index) => ({
+            const order = Array.from(list.children).map((li, i) => ({
                 id: li.dataset.id,
-                order: index
+                order: i
             }));
-            fetch('/reorder', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(order)
+            fetch("/reorder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(order),
             });
         }
     });
+
+    const modal = document.getElementById("editModal");
+    const modalBody = document.getElementById("modal-body");
+    const closeModal = document.getElementById("closeModal");
+
+    document.querySelectorAll(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const url = btn.getAttribute("href");
+
+            const res = await fetch(url);
+            const html = await res.text();
+
+            modalBody.innerHTML = html;
+            modal.style.display = "flex";
+
+            const form = document.getElementById("edit-task-form");
+            form.addEventListener("submit", async (evt) => {
+                evt.preventDefault();
+
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (response.redirected) {
+                    window.location = response.url;
+                    return;
+                }
+
+                const json = await response.json();
+
+                if (json.success) {
+                    location.reload();
+                }
+            });
+
+        });
+    });
+
+    closeModal.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => {
+        if (e.target === modal) modal.style.display = "none";
+    };
 </script>
 
 {% endblock %}
