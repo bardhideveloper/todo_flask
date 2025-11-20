@@ -3,11 +3,13 @@ from flask import jsonify, render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import db, User, Task
+from email_utils import send_welcome_email 
+
 
 def init_app(app):
 
     # -----------------------------
-    # LOGIN & REGISTER ROUTES
+    # REGISTER ROUTE
     # -----------------------------
     @app.route("/register", methods=["GET", "POST"])
     def register():
@@ -20,22 +22,39 @@ def init_app(app):
             address = request.form.get("address")
             phone = request.form.get("phone")
 
+            # Check duplicates
             if User.query.filter_by(username=username).first():
                 flash("Username already exists!")
                 return redirect(url_for("register"))
-            
+
             if User.query.filter_by(email=email).first():
                 flash("Email already registered!")
                 return redirect(url_for("register"))
 
-            new_user = User(username=username, password=generate_password_hash(password),email=email,birthdate=birthdate,gender=gender,address=address,phone=phone)
+            # Create user
+            new_user = User(
+                username=username,
+                password=generate_password_hash(password),
+                email=email,
+                birthdate=birthdate,
+                gender=gender,
+                address=address,
+                phone=phone
+            )
+
             db.session.add(new_user)
             db.session.commit()
-            flash("Account created! You can now log in.")
+
+            send_welcome_email(email, username)
+
+            flash("Account created! Check your email. You can now log in.")
             return redirect(url_for("login"))
 
         return render_template("register.html")
 
+    # -----------------------------
+    # LOGIN ROUTE
+    # -----------------------------
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if request.method == "POST":
@@ -52,6 +71,9 @@ def init_app(app):
 
         return render_template("login.html")
 
+    # -----------------------------
+    # LOGOUT
+    # -----------------------------
     @app.route("/logout")
     @login_required
     def logout():
@@ -59,7 +81,7 @@ def init_app(app):
         return redirect(url_for("login"))
 
     # -----------------------------
-    # TASK ROUTES
+    # INDEX (TASK LIST)
     # -----------------------------
     @app.route("/")
     @login_required
@@ -67,20 +89,33 @@ def init_app(app):
         tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.order).all()
         return render_template("index.html", tasks=tasks)
 
+    # -----------------------------
+    # ADD TASK
+    # -----------------------------
     @app.route("/add", methods=["POST"])
     @login_required
     def add():
         task_text = request.form.get("task")
         deadline = request.form.get("deadline") or None
         priority = request.form.get("priority") or "Medium"
-        
 
         if task_text:
-            new_task = Task(task=task_text, user_id=current_user.id, deadline=deadline, priority=priority, created_by=current_user.username,created_at=datetime.utcnow())
+            new_task = Task(
+                task=task_text,
+                user_id=current_user.id,
+                deadline=deadline,
+                priority=priority,
+                created_by=current_user.username,
+                created_at=datetime.utcnow()
+            )
             db.session.add(new_task)
             db.session.commit()
+
         return redirect(url_for("index"))
 
+    # -----------------------------
+    # DELETE TASK
+    # -----------------------------
     @app.route("/delete/<int:id>")
     @login_required
     def delete(id):
@@ -89,13 +124,16 @@ def init_app(app):
             db.session.delete(task)
             db.session.commit()
         return redirect(url_for("index"))
-    
+
+    # -----------------------------
+    # EDIT TASK
+    # -----------------------------
     @app.route("/edit/<int:id>", methods=["GET", "POST"])
     @login_required
     def edit(id):
         task = Task.query.get(id)
         if not task or task.user_id != current_user.id:
-            return jsonify({"error":"Unauthorized"}), 403
+            return jsonify({"error": "Unauthorized"}), 403
 
         if request.method == "POST":
             task.task = request.form.get("task")
@@ -104,10 +142,13 @@ def init_app(app):
             task.updated_by = current_user.username
             task.updated_at = datetime.utcnow()
             db.session.commit()
-            return jsonify({"success":True})
+            return jsonify({"success": True})
 
         return render_template("edit_form.html", task=task)
 
+    # -----------------------------
+    # COMPLETE TASK
+    # -----------------------------
     @app.route("/complete/<int:id>")
     @login_required
     def complete(id):
@@ -119,6 +160,9 @@ def init_app(app):
             db.session.commit()
         return redirect(url_for("index"))
 
+    # -----------------------------
+    # TOGGLE THEME
+    # -----------------------------
     @app.route("/toggle_theme")
     @login_required
     def toggle_theme():
@@ -126,6 +170,9 @@ def init_app(app):
         db.session.commit()
         return redirect(request.referrer or url_for("index"))
 
+    # -----------------------------
+    # REORDER TASKS
+    # -----------------------------
     @app.route("/reorder", methods=["POST"])
     @login_required
     def reorder():
@@ -136,5 +183,6 @@ def init_app(app):
                 task.order = item.get('order', task.order)
                 task.updated_by = current_user.username
                 task.updated_at = datetime.utcnow()
+
         db.session.commit()
         return jsonify({"status": "ok"})
