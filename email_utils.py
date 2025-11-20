@@ -1,8 +1,7 @@
 import os
 import resend
 
-# Set API key from environment variable
-resend.api_key = os.environ.get("re_6AoGYmJw_Kryf1bCHd4qMGwbydCNg5Rvy")
+resend.api_key = os.environ.get("RESEND_API_KEY")
 
 
 def send_welcome_email(to_email, username):
