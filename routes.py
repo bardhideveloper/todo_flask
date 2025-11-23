@@ -3,6 +3,7 @@ from flask import jsonify, render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import db, User, Task
+from decorators import admin_required
 from email_utils import send_welcome_email
 from datetime import date
 
@@ -66,7 +67,10 @@ def init_app(app):
                 return redirect(url_for("login"))
 
             login_user(user)
-            return redirect(url_for("index"))
+            if user.is_admin:
+                return redirect(url_for("admin_dashboard"))
+            else:
+                return redirect(url_for("index"))
 
         return render_template("login.html")
 
@@ -185,3 +189,43 @@ def init_app(app):
         current_user.theme = "dark" if current_user.theme == "light" else "light"
         db.session.commit()
         return redirect(request.referrer or url_for("index"))
+
+# -----------------------------
+# ADMIN PANEL ROUTES
+# -----------------------------
+    @app.route("/admin")
+    @admin_required
+    def admin_dashboard():
+        users = User.query.all()
+        tasks = Task.query.order_by(Task.created_at.desc()).all()
+        return render_template("admin/dashboard.html", users=users, tasks=tasks)
+
+    @app.route("/admin/delete_user/<int:user_id>")
+    @admin_required
+    def delete_user(user_id):
+        user = User.query.get(user_id)
+        if user and not user.is_admin:  # Prevent deleting admins
+            db.session.delete(user)
+            db.session.commit()
+            flash(f"User {user.username} deleted.")
+        return redirect(url_for("admin_dashboard"))
+
+    @app.route("/admin/delete_task/<int:task_id>")
+    @admin_required
+    def delete_task(task_id):
+        task = Task.query.get(task_id)
+        if task:
+            db.session.delete(task)
+            db.session.commit()
+            flash(f"Task '{task.task}' deleted.")
+        return redirect(url_for("admin_dashboard"))
+
+    @app.route("/admin/toggle_admin/<int:user_id>")
+    @admin_required
+    def toggle_admin(user_id):
+        user = User.query.get(user_id)
+        if user:
+            user.is_admin = not user.is_admin
+            db.session.commit()
+            flash(f"User {user.username} admin status updated.")
+        return redirect(url_for("admin_dashboard"))

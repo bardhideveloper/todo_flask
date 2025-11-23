@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     gender = db.Column(db.String(20))
     address = db.Column(db.String(255))
     phone = db.Column(db.String(20))
+    is_admin = db.Column(db.Boolean, default=False)
 
     tasks = db.relationship("Task", backref="user", lazy=True, cascade="all, delete-orphan")
 
