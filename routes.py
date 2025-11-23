@@ -22,7 +22,6 @@ def init_app(app):
             address = request.form.get("address")
             phone = request.form.get("phone")
 
-            # Check duplicates
             if User.query.filter_by(username=username).first():
                 flash("Username already exists!")
                 return redirect(url_for("register"))
@@ -31,7 +30,6 @@ def init_app(app):
                 flash("Email already registered!")
                 return redirect(url_for("register"))
 
-            # Create user
             new_user = User(
                 username=username,
                 password=generate_password_hash(password),
@@ -72,7 +70,7 @@ def init_app(app):
         return render_template("login.html")
 
     # -----------------------------
-    # LOGOUT
+    # LOGOUT ROUTE
     # -----------------------------
     @app.route("/logout")
     @login_required
@@ -81,7 +79,7 @@ def init_app(app):
         return redirect(url_for("login"))
 
     # -----------------------------
-    # INDEX (TASK LIST)
+    # INDEX TASK LIST ROUTE
     # -----------------------------
     @app.route("/")
     @login_required
@@ -90,7 +88,7 @@ def init_app(app):
         return render_template("index.html", tasks=tasks)
 
     # -----------------------------
-    # ADD TASK
+    # ADD TASK ROUTE
     # -----------------------------
     @app.route("/add", methods=["POST"])
     @login_required
@@ -114,7 +112,7 @@ def init_app(app):
         return redirect(url_for("index"))
 
     # -----------------------------
-    # DELETE TASK
+    # DELETE TASK ROUTE
     # -----------------------------
     @app.route("/delete/<int:id>")
     @login_required
@@ -126,7 +124,7 @@ def init_app(app):
         return redirect(url_for("index"))
 
     # -----------------------------
-    # EDIT TASK
+    # EDIT TASK ROUTE
     # -----------------------------
     @app.route("/edit/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -147,7 +145,7 @@ def init_app(app):
         return render_template("edit_form.html", task=task)
 
     # -----------------------------
-    # COMPLETE TASK
+    # COMPLETE TASK ROUTE
     # -----------------------------
     @app.route("/complete/<int:id>")
     @login_required
@@ -159,16 +157,6 @@ def init_app(app):
             task.updated_at = datetime.utcnow()
             db.session.commit()
         return redirect(url_for("index"))
-
-    # -----------------------------
-    # TOGGLE THEME
-    # -----------------------------
-    @app.route("/toggle_theme")
-    @login_required
-    def toggle_theme():
-        current_user.theme = "dark" if current_user.theme == "light" else "light"
-        db.session.commit()
-        return redirect(request.referrer or url_for("index"))
 
     # -----------------------------
     # REORDER TASKS
@@ -186,3 +174,13 @@ def init_app(app):
 
         db.session.commit()
         return jsonify({"status": "ok"})
+    
+    # -----------------------------
+    # TOGGLE THEME ROUTE
+    # -----------------------------
+    @app.route("/toggle_theme")
+    @login_required
+    def toggle_theme():
+        current_user.theme = "dark" if current_user.theme == "light" else "light"
+        db.session.commit()
+        return redirect(request.referrer or url_for("index"))

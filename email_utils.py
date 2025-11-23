@@ -3,7 +3,6 @@ import resend
 
 resend.api_key = os.environ.get("RESEND_API_KEY")
 
-
 def send_welcome_email(to_email, username):
     """Send welcome email using Resend API"""
     try:
