@@ -2,70 +2,91 @@
 
 {% block content %}
 
+<script src="{{ url_for('static', filename='js/tableSearchAdmin.js') }}"></script>
+
 <h3>Users</h3>
-<table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-bottom:20px;">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Birthdate</th>
-            <th>Gender</th>
-            <th>Address</th>
-            <th>Phone</th>
-            <th>Admin</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.birthdate }}</td>
-            <td>{{ user.gender }}</td>
-            <td>{{ user.address }}</td>
-            <td>{{ user.phone }}</td>
-            <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
-            <td>
-                {% if not user.is_admin %}
-                    <a class="table-btn admin" href="{{ url_for('toggle_admin', user_id=user.id) }}"><i class="fas fa-user-shield"></i></a>
-                    <a class="table-btn delete" href="{{ url_for('delete_user', user_id=user.id) }}" onclick="return confirm('Are you sure you want to delete this user?')"><i class="fas fa-trash-alt"></i></a>
-                {% else %}
+<input type="text" class="table-search" placeholder="Search users..." onkeyup="filterTable('users-table', this.value)">
+<div class="table-wrapper">
+    <table id="users-table" border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-bottom:20px;">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Birthdate</th>
+                <th>Gender</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Admin</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.birthdate }}</td>
+                <td>{{ user.gender }}</td>
+                <td>{{ user.address }}</td>
+                <td>{{ user.phone }}</td>
+                <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+                <td>
+                    {% if not user.is_admin %}
+                    <!-- Admin toggle button -->
+                    <a class="table-btn admin" href="{{ url_for('toggle_admin', user_id=user.id) }}">
+                        <i class="fas fa-user-shield"></i>
+                    </a>
+                    <!-- Delete button -->
+                    <a class="table-btn delete" href="{{ url_for('delete_user', user_id=user.id) }}"
+                        onclick="return confirm('Are you sure you want to delete this user?')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                    <!-- Reset password button -->
+                    <a class="table-btn warning" href="{{ url_for('reset_user_password', user_id=user.id) }}">
+                        <i class="fas fa-key"></i>
+                    </a>
+                    {% else %}
                     <em>Admin</em>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <h3>Tasks</h3>
-<table border="1" cellpadding="8" cellspacing="0" style="width:100%;">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Task</th>
-            <th>User</th>
-            <th>Priority</th>
-            <th>Deadline</th>
-            <th>Completed</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for task in tasks %}
-        <tr>
-            <td>{{ task.id }}</td>
-            <td>{{ task.task }}</td>
-            <td>{{ task.user.username }}</td>
-            <td>{{ task.priority }}</td>
-            <td>{{ task.deadline }}</td>
-            <td>{{ 'Yes' if task.completed else 'No' }}</td>
-            <td>
-                <a class="table-btn delete" href="{{ url_for('delete_task', task_id=task.id) }}" onclick="return confirm('Are you sure you want to delete this task?')"><i class="fas fa-trash-alt"></i></a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<input type="text" class="table-search" placeholder="Search tasks..." onkeyup="filterTable('tasks-table', this.value)">
+<div class="table-wrapper">
+    <table id="tasks-table" border="1" cellpadding="8" cellspacing="0" style="width:100%;">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>User</th>
+                <th>Priority</th>
+                <th>Deadline</th>
+                <th>Completed</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.task }}</td>
+                <td>{{ task.user.username }}</td>
+                <td>{{ task.priority }}</td>
+                <td>{{ task.deadline }}</td>
+                <td>{{ 'Yes' if task.completed else 'No' }}</td>
+                <td>
+                    <a class="table-btn delete" href="{{ url_for('delete_task', task_id=task.id) }}"
+                        onclick="return confirm('Are you sure you want to delete this task?')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

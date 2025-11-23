@@ -636,3 +636,46 @@ table tbody tr td em {
     border-color: #c0392b;
 }
 
+.table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 12px;
+}
+
+.table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* ===========================
+   TABLE SEARCH INPUT
+=========================== */
+.table-search {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.table-search:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 5px rgba(74, 108, 247, 0.3);
+}
+
+.table-search::placeholder {
+    color: rgba(0,0,0,0.4);
+    font-style: italic;
+}
+
+body.dark .table-search::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
