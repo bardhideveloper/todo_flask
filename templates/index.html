@@ -37,22 +37,29 @@
                     <strong>{{ t.task }}</strong><br>
 
                     <div class="task-meta-row">
+
                         {% if t.deadline %}
                         <div class="deadline-badge">📅 {{ t.deadline }}</div>
-                        {% endif %}
-                        <div class="priority-badge {{ t.priority|lower }}">{{ t.priority }}</div>
+                        {% if t.deadline < today|string %} <div class="deadline-badge overdue">⏰ Overdue
                     </div>
-                </div>
+                    {% endif %}
+                    {% endif %}
 
-                <div class="action-buttons">
-                    <a href="/complete/{{ t.id }}" class="btn-icon success">✔</a>
-                    <a href="/edit/{{ t.id }}" class="btn-icon warning edit-btn">✎</a>
-                    <a href="/delete/{{ t.id }}" class="btn-icon danger">✖</a>
+                    <div class="priority-badge {{ t.priority|lower }}">{{ t.priority }}</div>
+
                 </div>
-            </li>
-            {% endfor %}
-        </ul>
     </div>
+
+    <div class="action-buttons">
+        <a href="/complete/{{ t.id }}" class="btn-icon success">✔</a>
+        <a href="/edit/{{ t.id }}" class="btn-icon warning edit-btn">✎</a>
+        <a href="/delete/{{ t.id }}" class="btn-icon danger">✖</a>
+    </div>
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+
 
 </div>
 

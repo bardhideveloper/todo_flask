@@ -3,7 +3,8 @@ from flask import jsonify, render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import db, User, Task
-from email_utils import send_welcome_email 
+from email_utils import send_welcome_email
+from datetime import date
 
 
 def init_app(app):
@@ -85,7 +86,7 @@ def init_app(app):
     @login_required
     def index():
         tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.order).all()
-        return render_template("index.html", tasks=tasks)
+        return render_template("index.html", tasks=tasks, today=date.today())
 
     # -----------------------------
     # ADD TASK ROUTE
