@@ -41,8 +41,7 @@
 
         <div class="nav">
             {% if current_user.is_authenticated %}
-            Logged in as <b>{{ current_user.username }}</b> |
-            <a class="btn-link danger" href="/logout">Logout</a>
+            <a class="btn-link danger" href="/logout" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
             {% else %}
             <a class="btn-link auth-pink" href="/login">Login</a> |
             <a class="btn-link auth-pink" href="/register">Register</a>
