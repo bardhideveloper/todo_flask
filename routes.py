@@ -230,12 +230,12 @@ def init_app(app):
             flash(f"User {user.username} admin status updated.")
         return redirect(url_for("admin_dashboard"))
     
-    @app.route("/admin/reset_password/<int:user_id>", methods=["POST"])
+    @app.route("/admin/reset_password/<int:user_id>", methods=["GET", "POST"])
     @admin_required
     def reset_user_password(user_id):
         user = User.query.get(user_id)
         if user:
-            new_password = "temporary123"  # Or generate a secure random password
+            new_password = "123456789" 
             user.password = generate_password_hash(new_password)
         db.session.commit()
         flash(f"{user.username}'s password has been reset.")
